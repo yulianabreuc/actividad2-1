@@ -1,0 +1,69 @@
+doctype html
+html
+  head
+    title Biblioteca Publica
+    style.
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+        margin: 0;
+        padding: 20px;
+      }
+      h2 {
+        color: #333;
+      }
+      p {
+        color: #000;
+        font-size: 2em;
+        font-weight: bold;
+      }
+      ul {
+        list-style-type: none;
+        padding: 0;
+      }
+      li {
+        margin: 15px 0; /* Increased margin for more spacing */
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        background-color: #fff; /* Added background color for better differentiation */
+      }
+      span.description {
+        display: block; /* Display description on a new line */
+        color: #555; /* Different color for description */
+        margin-top: 5px; /* Margin to separate from title */
+      }
+      span.user {
+        display: block; /* Display username on a new line */
+        color: #888; /* Different color for username */
+        margin-top: 5px; /* Margin to separate from description */
+      }
+      .comments {
+        margin-top: 10px; /* Margin to separate from publication details */
+        padding-left: 20px; /* Indentation for comments */
+      }
+      .comment {
+        margin-top: 5px; /* Margin between comments */
+        color: #666; /* Different color for comments */
+      }
+  body
+    p Hola!
+    if welcomeMessage
+      p #{welcomeMessage}
+    else
+      p Bienvenido a la biblioteca publica
+
+    if publicaciones && publicaciones.length
+      h2 Publicaciones
+      ul
+        each publi in publicaciones
+          li
+            span.title #{publi.title}
+            span.description #{publi.description}
+            span.user #{publi.user.userName}
+            if publi.comments && publi.comments.length
+              div.comments
+                each comment in publi.comments
+                  div.comment #{comment}
+    else
+      p No hay publiaciones generales

@@ -1,0 +1,59 @@
+doctype html
+html
+    head
+        title Biblioteca Publica - Usuarios Registrados
+        style.
+            body {
+                font-family: Arial, sans-serif;
+                background-color: #f4f4f4;
+                margin: 0;
+                padding: 20px;
+            }
+            h2 {
+                color: #333;
+            }
+            p {
+                color: #666;
+            }
+            ul {
+                list-style-type: none;
+                padding: 0;
+            }
+            li {
+                margin: 5px 0;
+                padding: 10px;
+                border: 1px solid #ddd;
+                border-radius: 4px;
+            }
+            p {
+                color: #000;
+                font-size: 2em;
+                font-weight: bold;
+            }
+            .activo {
+                background-color: #d4edda;
+                border-color: #c3e6cb;
+            }
+            .inactivo {
+                background-color: #f8d7da;
+                border-color: #f5c6cb;
+            }
+            .admin {
+                background-color: #d1ecf1;
+                border-color: #bee5eb;
+            }
+    body
+        p Hola!
+        if welcomeMessage
+            p #{welcomeMessage}
+        else
+            p Bienvenido a la biblioteca publica
+
+        if users && users.length
+            h2 Lista de Usuarios Registrados
+            ul
+                each user in users
+                    li(class=(user.activo ? 'activo' : 'inactivo') + (user.permission === 'admin' ? ' admin' : '')) 
+                        | #{user.name} - #{user.lastName} - #{user.email} - #{user.permission === 'admin' ? 'Admin' : 'Usuario'}
+        else
+            p No hay usuarios registrados
