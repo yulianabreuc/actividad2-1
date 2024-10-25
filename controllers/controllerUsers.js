@@ -14,7 +14,7 @@ class UserController {
                 userName: req.body.userName,
                 email: req.body.email,
                 password: hashedPassword,
-                permission: 'admin'
+                permission: 'normal'
             });
             const newUser = await user.save();
             res.status(201).json(newUser);
