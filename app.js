@@ -1,5 +1,13 @@
 const express = require('express');
+const mongoose = require('mongoose');
 const app = express();
+const { mongoURI } = require('./config/config.js');
+
+// Conectar a MongoDB
+mongoose.connect(mongoURI)
+  .then(() => console.log('MongoDB conectado'))
+  .catch(err => console.error('Error al conectar a MongoDB:', err));
+
 
 const routesUsers = require('./routes/routesuser.js');
 const routesPublicaciones = require('./routes/routespublicaciones.js');
@@ -7,7 +15,7 @@ const routesAmi = require('./routes/routesamistad.js');
 const routesfeed = require('./routes/routesfeed.js');
 
 app.set('view engine', 'pug');
-app.set('views', './views');
+app.set('views', './views'); 
 
 app.use(express.json());
 
