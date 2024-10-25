@@ -6,6 +6,7 @@ const PublicacionSchema = new Schema({
   description: { type: String, required: true, unique: false },
   urlMedia: { type: String, required: true, unique: false },
   idUser: { type: Schema.Types.ObjectId, ref: 'User', unique: false },
+  createdAt: { type: Date, default: Date.now }
 });
 
 module.exports = mongoose.model('Publicacion', PublicacionSchema);

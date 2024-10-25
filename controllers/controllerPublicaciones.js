@@ -2,13 +2,13 @@ const Publicacion = require('../models/modelPublicaciones');
 const User = require('../models/User');
 const Comment = require('../models/Comment');
 
-class UserController {
+class PubliController {
     async createPublicacion(req, res) {
         const { title, description, urlMedia, idUser } = req.body;
         if (!title || !description || !urlMedia) {
             res.status(400).json({ message: 'Faltan datos requeridos: title, description, urlMedia' });
         } else {
-            const user = await User.findOne({id: idUser});
+            const user = await User.findById(idUser);
             if (!user) {
                 return res.status(404).json({ message: 'Usuario no encontrado' });
             } else {
@@ -105,4 +105,4 @@ class UserController {
         }
     }
 }
-module.exports = new UserController();
+module.exports = new PubliController();
