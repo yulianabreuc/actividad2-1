@@ -73,6 +73,7 @@
         nav li {
             list-style: none;
             cursor: pointer;
+            margin-right: 20px;
         }
         nav a {
             color: #000;
@@ -285,7 +286,8 @@
     <p>Hola! Bienvenido</p>
     <nav>
         <ul>
-            <li onclick="showCreateUserForm()">Crear Usuario</li>
+            <li><a href="#" onclick="showCreateUserForm()">Crear Usuario</a></li>
+            <li><a href="/home">Publicaciones</a></li>
         </ul>
     </nav>
     <div id="createUserForm">
