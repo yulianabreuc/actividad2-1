@@ -8,6 +8,7 @@ class PubliController {
         if (!title || !description || !urlMedia) {
             res.status(400).json({ message: 'Faltan datos requeridos: title, description, urlMedia' });
         } else {
+
             const user = await User.findById(idUser);
             if (!user) {
                 return res.status(404).json({ message: 'Usuario no encontrado' });
@@ -17,7 +18,7 @@ class PubliController {
                         title: title,
                         description: description,
                         urlMedia: urlMedia,
-                        idUser: idUser,
+                        User: user._id,
                     });
                     const newPubli = await publicacion.save();
                     res.status(201).json({ message: 'Publicacion Guardada', data: newPubli });
@@ -29,28 +30,36 @@ class PubliController {
     }
     async getPublicaciones(req, res) {
         try {
-            const publi = await Publicacion.find();
-            res.json(publi);
-        } catch (err) {
-            res.status(400).json({ message: 'Error al Consultar publicaciones', error: error.message });
+          const publicaciones = await Publicacion.find()
+            .populate('User')
+            .populate({
+                path: 'comentarios',
+                match: { idPublicacion: { $exists: true } }
+            });
+      
+          if (!publicaciones || publicaciones.length === 0) {
+            return res.status(404).json({ message: 'No hay publicaciones' });
+          }
+      
+          res.json(publicaciones);
+        } catch (error) {
+          res.status(400).json({ message: 'Error al obtener publicaciones', error: error.message });
         }
-    }
+      }    
     async createComentarioPubli(req, res) {
         const { idPublicacion, comment, user } = req.body;
-        if (!comment || !user) {
+        if (!comment || !user || !idPublicacion) {
             return res.status(400).json({ message: 'Faltan datos requeridos: comment, user' });
         }
         try {
-            const getuser = await User.findOne({id: user});
-            const userSend = getuser._id;
             const publi = await Publicacion.findById(idPublicacion);
             if (!publi) {
                 return res.status(404).json({ message: 'Publicacion no encontrada' });
             }
             const newComment = new Comment({
-                comment,
-                user: userSend,
-                publicacion: idPublicacion
+                text: comment,
+                idUser: user,
+                idPublicacion: idPublicacion
             });
             await newComment.save();
             res.status(201).json({ message: 'Comentario Guardado', data: newComment });
@@ -102,6 +111,19 @@ class PubliController {
             res.json(publi);
         } catch (error) {
             res.status(400).json({ message: 'Error al consultar la publicacion', error: error.message });
+        }
+    }
+
+    async getComentariosByPubliId(req, res) {
+        const { publicationId } = req.params;
+        try {
+            const comentarios = await Comment.find({ idPublicacion: publicationId }).populate('idUser')
+            if (!comentarios || comentarios.length === 0) {
+                return res.status(404).json({ message: 'No hay comentarios' });
+            }
+            res.json(comentarios);
+        } catch (error) {
+            res.status(400).json({ message: 'Error al obtener comentarios', error: error.message });
         }
     }
 }

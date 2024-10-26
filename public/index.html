@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Biblioteca Publica</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+        h2 {
+            color: #333;
+        }
+        p {
+            color: #000;
+            font-size: 2em;
+            font-weight: bold;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        li {
+            margin: 15px 0;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background-color: #fff;
+        }
+        span.description {
+            display: block;
+            color: #555;
+            margin-top: 5px;
+        }
+        span.user {
+            display: block;
+            color: #888;
+            margin-top: 5px;
+        }
+        .comments {
+            margin-top: 10px;
+            padding-left: 20px;
+        }
+        .comment {
+            margin-top: 5px;
+            color: #666;
+        }
+        .publication {
+            margin-bottom: 20px;
+            padding: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #fff;
+        }
+        .publication h2 {
+            margin: 0;
+            font-size: 1.5em;
+        }
+        .publication p {
+            margin: 5px 0;
+        }
+        .publication .user {
+            font-size: 0.9em;
+            color: #777;
+        }
+        .publication .date {
+            font-size: 0.8em;
+            color: #aaa;
+        }
+        .publication button {
+            margin-top: 10px;
+            padding: 5px 10px;
+            background-color: #007BFF;
+            color: #fff;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        .publication button:hover {
+            background-color: #0056b3;
+        }
+        nav {
+            background-color: #007BFF;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        nav ul {
+            display: flex;
+            justify-content: flex-start;
+            margin: 0;
+            padding: 0;
+        }
+        nav li {
+            list-style: none;
+        }
+        nav a {
+            color: #000;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        nav a:hover {
+            text-decoration: underline;
+        }
+    </style>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            fetch('/api/publi')
+                .then(response => response.json())
+                .then(data => {
+                    const publicacionesList = document.getElementById('publicacionesList');
+                    data.forEach(publicacion => {
+                        const publicacionElement = document.createElement('li');
+                        publicacionElement.classList.add('publication');
+                        const formattedDate = new Date(publicacion.createdAt).toLocaleDateString('es-ES', {
+                            day: '2-digit',
+                            month: '2-digit',
+                            year: 'numeric'
+                        });
+                        publicacionElement.innerHTML = `
+                            <h2>${publicacion.title}</h2>
+                            <p>${publicacion.description}</p>
+                            <img src="${publicacion.urlMedia}" alt="${publicacion.title}">
+                            <span class="user">Creado por: ${publicacion.User.userName}</span>
+                            <span class="date">Fecha de creación: ${formattedDate}</span>
+                            <button onclick="viewComments('${publicacion._id}', this)">Ver comentarios</button>
+                            <div class="comments" id="comments-${publicacion._id}" style="display: none;"></div>
+                        `;
+                        publicacionesList.appendChild(publicacionElement);
+                    });
+                })
+                .catch(error => console.error('Error fetching publicaciones:', error));
+        });
+
+        function viewComments(publicacionId, button) {
+            const commentsDiv = document.getElementById(`comments-${publicacionId}`);
+            if (commentsDiv.style.display === 'none') {
+                fetch(`/api/publi/comment/${publicacionId}`)
+                    .then(response => response.json())
+                    .then(comments => {
+                        commentsDiv.innerHTML = '';
+                        if (comments.message) {
+                            commentsDiv.innerHTML = '<p>No hay comentarios</p>';
+                        } else {
+                            
+                            comments.forEach(comment => {
+                                const formattedDate = new Date(comment.createdAt).toLocaleDateString('es-ES', {
+                                    day: '2-digit',
+                                    month: '2-digit',
+                                    year: 'numeric'
+                                });
+                                const commentElement = document.createElement('div');
+                                commentElement.classList.add('comment');
+                                commentElement.innerHTML = `
+                                    <p>${comment.text}</p>
+                                    <span class="user">Creado por: ${comment.idUser.userName}</span>
+                                    <span class="date">Fecha de creación: ${formattedDate}</span>
+                                `;
+                                commentsDiv.appendChild(commentElement);
+                            });
+                        }
+                        commentsDiv.style.display = 'block';
+                        button.textContent = 'Ocultar comentarios';
+                    })
+                    .catch(error => console.error('Error fetching comments:', error));
+            } else {
+                commentsDiv.style.display = 'none';
+                button.textContent = 'Ver comentarios';
+            }
+        }
+    </script>
+</head>
+<body>
+    <p>Hola! Bienvenido</p>
+    <nav>
+        <ul>
+            <li><a href="/users">Usuarios</a></li>
+        </ul>
+    </nav>
+    <p id="welcomeMessage"></p>
+    <h2 id="publicacionesTitle">Publicaciones</h2>
+    <ul id="publicacionesList"></ul>
+    <p id="noPublicaciones" style="display: none;">No hay publicaciones generales</p>
+</body>
+</html>

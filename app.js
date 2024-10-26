@@ -24,14 +24,15 @@ app.use('/api/publi', routesPublicaciones);
 app.use('/api/amistad', routesAmi);
 app.use('/api/feed', routesfeed);
 
-const { getPubli, getUsers, getFeed } = require('./models/models.js');
+const { getUsers, getFeed } = require('./models/models.js');
+const Publicacion = require('./models/modelPublicaciones.js');
+const path = require('path');
+
 app.get('/home', (req, res) => {
-    const publicaciones = getPubli();
-    res.render('index', { welcomeMessage: 'Bienvenido', publicaciones: publicaciones });
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 app.get('/users', (req, res) => {
-    const users = getUsers();
-    res.render('users', { welcomeMessage: 'Usuarios Registrados', users: users });
+    res.sendFile(path.join(__dirname, 'public', 'users.html'));
 });
 app.get('/feed', (req, res) => {
     const feed = getFeed();
