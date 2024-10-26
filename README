@@ -67,6 +67,16 @@ La API proporciona los siguientes endpoints:
 
 
 
+    desde la api, agregar comentario con:
+    POST
+    http://localhost:3000/api/publi/comment 
+    {
+        "idPublicacion": "671c4092d941d58122303699",
+        "comment": "probando comentario",
+        "user": "671c1ca60c52024715133ad2"
+    }
+
+
     ## Propósito Educativo
 
     Esta actividad ha sido creada para uso educativo de la Universidad Valle del Momboy. El objetivo es desarrollar una API utilizando Node.js, JavaScript y Express.js, MongoDB.
