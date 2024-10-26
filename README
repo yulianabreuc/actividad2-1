@@ -28,9 +28,8 @@ npm start
 
 Puedes visitar las siguientes vistas a través de las URLs correspondientes:
 
-- `/home`: Proporciona la vista principal de la aplicación mostrando todas las publiaciones que existan.
-- `/users`: Muestra una lista de usuarios registrados.
-- `/feed`: Muestra publicaciones pero solo la ultima publicacion por cada usuario.
+- `/home`: Proporciona la vistas se puede realizar un CRUD al modelo Publicaciones
+- `/users`: Proporciona vistas para  realizar un CRUD al modelo USers
 
 ## Endpoints Disponibles para la API
 
