@@ -167,7 +167,7 @@
             .then(response => response.json())
             .then(data => {
                 const publicacionesList = document.getElementById('publicacionesList');
-                publicacionesList.innerHTML = ''; // Clear the list before adding new items
+                publicacionesList.innerHTML = '';
                 data.forEach(publicacion => {
                 const publicacionElement = document.createElement('li');
                 publicacionElement.classList.add('publication');

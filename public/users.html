@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Publicbs</title>
     <style>
-        /* Existing styles */
         body {
             font-family: Arial, sans-serif;
             background-color: #f4f4f4;
@@ -137,7 +136,7 @@
             .then(response => response.json())
             .then(data => {
                 const usersList = document.getElementById('usersList');
-                usersList.innerHTML = ''; // Clear the list before adding new users
+                usersList.innerHTML = '';
                 data.forEach(user => {
                 const userElement = document.createElement('li');
                 userElement.classList.add('user');
