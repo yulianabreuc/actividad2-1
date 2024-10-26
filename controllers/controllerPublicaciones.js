@@ -8,7 +8,7 @@ class PubliController {
         if (!title || !description || !urlMedia) {
             res.status(400).json({ message: 'Faltan datos requeridos: title, description, urlMedia' });
         } else {
-
+            
             const user = await User.findById(idUser);
             if (!user) {
                 return res.status(404).json({ message: 'Usuario no encontrado' });

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Biblioteca Publica</title>
+    <title>Publicbs</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -95,6 +95,7 @@
         }
         nav li {
             list-style: none;
+            margin-right: 10px;
         }
         nav a {
             color: #000;
@@ -104,35 +105,102 @@
         nav a:hover {
             text-decoration: underline;
         }
+        .publicationForm{ 
+            display: none;
+        }
+        #createPublicationForm, #editUserForm {
+            display: none;
+            margin-top: 20px;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #fff;
+        }
+        #createPublicationForm input, #editUserForm input {
+            display: block;
+            margin-bottom: 10px;
+            padding: 10px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .create-button, .edit-button {
+            background-color: #28a745;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+        }
+        .create-button:hover, .edit-button:hover {
+            background-color: #218838;
+        }
+        .publication button.delete-button {
+            background-color: #dc3545;
+            color: #fff;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+
+        .publication button.delete-button:hover {
+            background-color: #c82333;
+        }
+
+        .publication button.edit-button {
+            background-color: #ffc107;
+            color: #fff;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+
+        .publication button.edit-button:hover {
+            background-color: #e0a800;
+        }
     </style>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            fetch('/api/publi')
-                .then(response => response.json())
-                .then(data => {
-                    const publicacionesList = document.getElementById('publicacionesList');
-                    data.forEach(publicacion => {
-                        const publicacionElement = document.createElement('li');
-                        publicacionElement.classList.add('publication');
-                        const formattedDate = new Date(publicacion.createdAt).toLocaleDateString('es-ES', {
-                            day: '2-digit',
-                            month: '2-digit',
-                            year: 'numeric'
-                        });
-                        publicacionElement.innerHTML = `
-                            <h2>${publicacion.title}</h2>
-                            <p>${publicacion.description}</p>
-                            <img src="${publicacion.urlMedia}" alt="${publicacion.title}">
-                            <span class="user">Creado por: ${publicacion.User.userName}</span>
-                            <span class="date">Fecha de creación: ${formattedDate}</span>
-                            <button onclick="viewComments('${publicacion._id}', this)">Ver comentarios</button>
-                            <div class="comments" id="comments-${publicacion._id}" style="display: none;"></div>
-                        `;
-                        publicacionesList.appendChild(publicacionElement);
-                    });
-                })
-                .catch(error => console.error('Error fetching publicaciones:', error));
+            fetchPublicaciones();
+            fetchUsers();
         });
+        
+
+        function fetchPublicaciones() {
+            fetch('/api/publi')
+            .then(response => response.json())
+            .then(data => {
+                const publicacionesList = document.getElementById('publicacionesList');
+                publicacionesList.innerHTML = ''; // Clear the list before adding new items
+                data.forEach(publicacion => {
+                const publicacionElement = document.createElement('li');
+                publicacionElement.classList.add('publication');
+                const formattedDate = new Date(publicacion.createdAt).toLocaleDateString('es-ES', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric'
+                });
+                publicacionElement.innerHTML = `
+                    <h2>${publicacion.title}</h2>
+                    <p>${publicacion.description}</p>
+                    <img src="${publicacion.urlMedia}" alt="${publicacion.title}">
+                    <span class="user">Creado por: ${publicacion.User.userName}</span>
+                    <span class="date">Fecha de creación: ${formattedDate}</span>
+                    <button onclick="viewComments('${publicacion._id}', this)">Ver comentarios</button>
+                    <button onclick="deletePublicacion('${publicacion._id}')">Eliminar</button>
+                    <button onclick="showEditForm('${publicacion._id}', '${publicacion.title}', '${publicacion.description}', '${publicacion.urlMedia}')">Modificar</button>
+                    <div class="comments" id="comments-${publicacion._id}" style="display: none;"></div>
+                `;
+                publicacionesList.appendChild(publicacionElement);
+                });
+            })
+            .catch(error => console.error('Error fetching publicaciones:', error));
+        }
 
         function viewComments(publicacionId, button) {
             const commentsDiv = document.getElementById(`comments-${publicacionId}`);
@@ -170,18 +238,185 @@
                 button.textContent = 'Ver comentarios';
             }
         }
+        function showCreatePublicationForm() {
+            const form = document.getElementById('createPublicationForm');
+            if (form.style.display === 'none' || form.style.display === '') {
+                form.style.display = 'block';
+            } else {
+                form.style.display = 'none';
+            }
+        }
+        
+        
+        function createPublicacion(event) {
+            event.preventDefault();
+            const formData = new FormData(document.getElementById('publicationForm'));
+            const publicationData = {
+                title: formData.get('title'),
+                description: formData.get('description'),
+                urlMedia: formData.get('urlMedia'),
+                idUser: formData.get('userId')
+            };
+            console.log(publicationData)
+            fetch('/api/publi', {
+                method: 'POST',
+                headers: {
+                'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(publicationData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data)
+                showModal(data.message);
+                fetchPublicaciones();
+                document.getElementById('publicationForm').reset();
+                document.getElementById('createPublicationForm').style.display = 'none';
+            })
+            .catch(error => console.error('Error creating publication:', error));
+        }
+        function closeModal() {
+            document.getElementById('modal').remove();
+        }
+
+        function showModal(message) {
+            const modal = document.createElement('div');
+            modal.id = 'modal';
+            modal.style.position = 'fixed';
+            modal.style.top = '50%';
+            modal.style.left = '50%';
+            modal.style.transform = 'translate(-50%, -50%)';
+            modal.style.backgroundColor = '#fff';
+            modal.style.padding = '20px';
+            modal.style.boxShadow = '0 0 10px rgba(0, 0, 0, 0.1)';
+            modal.style.zIndex = '1000';
+            modal.innerHTML = `
+                <p>${message}</p>
+                <button onclick="closeModal()">Cerrar</button>
+            `;
+            document.body.appendChild(modal);
+        }
+
+
+        function fetchUsers() {
+            fetch('/api/users')
+            .then(response => response.json())
+            .then(users => {
+                const userSelect = document.createElement('select');
+                userSelect.id = 'userSelect';
+                userSelect.name = 'userId';
+                userSelect.required = true;
+
+                users.forEach(user => {
+                    const option = document.createElement('option');
+                    option.value = user._id;
+                    option.textContent = user.userName;
+                    userSelect.appendChild(option);
+                });
+
+                const form = document.getElementById('publicationForm');
+                const userLabel = document.createElement('label');
+                userLabel.htmlFor = 'userSelect';
+                userLabel.textContent = 'Seleccionar Usuario:';
+                form.appendChild(userLabel);
+                form.appendChild(userSelect);
+            })
+            .catch(error => console.error('Error fetching users:', error));
+        }
+
+
+        function deletePublicacion(publicacionId) {
+            fetch(`/api/publi/${publicacionId}`, {
+                method: 'DELETE'
+            })
+            .then(response => response.json())
+            .then(data => {
+                showModal(data.message);
+                fetchPublicaciones();
+            })
+            .catch(error => console.error('Error deleting publication:', error));
+        }
+
+        function showEditForm(publicacionId, title, description, urlMedia) {
+            const form = document.getElementById('editPublicationForm');
+            form.style.display = 'block';
+            form.publicacionId.value = publicacionId;
+            form.title.value = title;
+            form.description.value = description;
+            form.urlMedia.value = urlMedia;
+        }
+
+        function editPublicacion(event) {
+            event.preventDefault();
+            const formData = new FormData(document.getElementById('editPublicationForm'));
+            const publicationData = {
+                title: formData.get('title'),
+                description: formData.get('description'),
+                urlMedia: formData.get('urlMedia')
+            };
+            const publicacionId = formData.get('publicacionId');
+            fetch(`/api/publi/${publicacionId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(publicationData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                showModal(data.message);
+                fetchPublicaciones();
+                document.getElementById('editPublicationForm').reset();
+                document.getElementById('editPublicationForm').style.display = 'none';
+            })
+            .catch(error => console.error('Error editing publication:', error));
+        }
+
     </script>
 </head>
 <body>
     <p>Hola! Bienvenido</p>
     <nav>
         <ul>
+            <li><a href="#" onclick="showCreatePublicationForm()">Crear Publicación</a></li>
             <li><a href="/users">Usuarios</a></li>
         </ul>
     </nav>
     <p id="welcomeMessage"></p>
+    <div id="createPublicationForm" style="margin-top: 20px;">
+        <h2>Crear Publicación</h2>
+        <form onsubmit="createPublicacion(event)"  id="publicationForm">
+            <label for="title">Título:</label>
+            <input type="text" id="title" name="title" required>
+            <br>
+            <label for="description">Descripción:</label>
+            <textarea id="description" name="description" required></textarea>
+            <br>
+            <label for="urlMedia">URL de la imagen:</label>
+            <input type="text" id="urlMedia" name="urlMedia">
+            <br>
+            <button type="submit" class="create-button">Publicar</button>
+        </form>
+    </div>
+    <div id="editPublicationForm" style="display: none; margin-top: 20px;">
+        <h2>Modificar Publicación</h2>
+        <form onsubmit="editPublicacion(event)">
+            <input type="hidden" name="publicacionId">
+            <label for="title">Título:</label>
+            <input type="text" id="editTitle" name="title" required>
+            <br>
+            <label for="description">Descripción:</label>
+            <textarea id="editDescription" name="description" required></textarea>
+            <br>
+            <label for="urlMedia">URL de la imagen:</label>
+            <input type="text" id="editUrlMedia" name="urlMedia">
+            <br>
+            <button type="submit" class="edit-button">Guardar cambios</button>
+        </form>
+    </div>
     <h2 id="publicacionesTitle">Publicaciones</h2>
     <ul id="publicacionesList"></ul>
     <p id="noPublicaciones" style="display: none;">No hay publicaciones generales</p>
+    
 </body>
 </html>
