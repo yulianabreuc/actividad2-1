@@ -70,18 +70,6 @@
             font-size: 0.8em;
             color: #aaa;
         }
-        .publication button {
-            margin-top: 10px;
-            padding: 5px 10px;
-            background-color: #007BFF;
-            color: #fff;
-            border: none;
-            border-radius: 3px;
-            cursor: pointer;
-        }
-        .publication button:hover {
-            background-color: #0056b3;
-        }
         nav {
             background-color: #007BFF;
             padding: 10px;
@@ -108,7 +96,7 @@
         .publicationForm{ 
             display: none;
         }
-        #createPublicationForm, #editUserForm {
+        #createPublicationForm, #editPublicationForm {
             display: none;
             margin-top: 20px;
             padding: 20px;
@@ -116,7 +104,7 @@
             border-radius: 5px;
             background-color: #fff;
         }
-        #createPublicationForm input, #editUserForm input {
+        #createPublicationForm input, #editPublicationForm input {
             display: block;
             margin-bottom: 10px;
             padding: 10px;
@@ -138,30 +126,33 @@
         .create-button:hover, .edit-button:hover {
             background-color: #218838;
         }
-        .publication button.delete-button {
+        .delete-button {
             background-color: #dc3545;
             color: #fff;
             border: none;
-            padding: 5px 10px;
-            border-radius: 3px;
+            padding: 10px 20px;
+            border-radius: 5px;
             cursor: pointer;
+            font-size: 1em;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
         }
-
-        .publication button.delete-button:hover {
+        .delete-button:hover {
             background-color: #c82333;
         }
-
-        .publication button.edit-button {
-            background-color: #ffc107;
+        .comments-button {
+            background-color: #007bff;
             color: #fff;
             border: none;
-            padding: 5px 10px;
-            border-radius: 3px;
+            padding: 10px 20px;
+            border-radius: 5px;
             cursor: pointer;
+            font-size: 1em;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
         }
-
-        .publication button.edit-button:hover {
-            background-color: #e0a800;
+        .comments-button:hover {
+            background-color: #0056b3;
         }
     </style>
     <script>
@@ -191,9 +182,9 @@
                     <img src="${publicacion.urlMedia}" alt="${publicacion.title}">
                     <span class="user">Creado por: ${publicacion.User.userName}</span>
                     <span class="date">Fecha de creación: ${formattedDate}</span>
-                    <button onclick="viewComments('${publicacion._id}', this)">Ver comentarios</button>
-                    <button onclick="deletePublicacion('${publicacion._id}')">Eliminar</button>
-                    <button onclick="showEditForm('${publicacion._id}', '${publicacion.title}', '${publicacion.description}', '${publicacion.urlMedia}')">Modificar</button>
+                    <button onclick="viewComments('${publicacion._id}', this)" class="comments-button">Ver comentarios</button>
+                    <button onclick="deletePublicacion('${publicacion._id}')" class="delete-button">Eliminar</button>
+                    <button onclick="showEditForm('${publicacion._id}', '${publicacion.title}', '${publicacion.description}', '${publicacion.urlMedia}', '${publicacion.User._id}')" class="edit-button">Modificar</button>
                     <div class="comments" id="comments-${publicacion._id}" style="display: none;"></div>
                 `;
                 publicacionesList.appendChild(publicacionElement);
@@ -257,7 +248,6 @@
                 urlMedia: formData.get('urlMedia'),
                 idUser: formData.get('userId')
             };
-            console.log(publicationData)
             fetch('/api/publi', {
                 method: 'POST',
                 headers: {
@@ -337,9 +327,9 @@
             .catch(error => console.error('Error deleting publication:', error));
         }
 
-        function showEditForm(publicacionId, title, description, urlMedia) {
-            const form = document.getElementById('editPublicationForm');
-            form.style.display = 'block';
+        function showEditForm(publicacionId, title, description, urlMedia, userId) {
+            document.getElementById('editPublicationForm').style.display = 'block';
+            const form = document.getElementById('editPublicationFormss');
             form.publicacionId.value = publicacionId;
             form.title.value = title;
             form.description.value = description;
@@ -348,13 +338,16 @@
 
         function editPublicacion(event) {
             event.preventDefault();
-            const formData = new FormData(document.getElementById('editPublicationForm'));
+            const formData = new FormData(document.getElementById('editPublicationFormss'));
             const publicationData = {
                 title: formData.get('title'),
                 description: formData.get('description'),
                 urlMedia: formData.get('urlMedia')
             };
             const publicacionId = formData.get('publicacionId');
+            console.log("entra en el editPublicacion")
+            console.log(publicationData)
+            console.log(publicacionId)
             fetch(`/api/publi/${publicacionId}`, {
                 method: 'PUT',
                 headers: {
@@ -366,7 +359,7 @@
             .then(data => {
                 showModal(data.message);
                 fetchPublicaciones();
-                document.getElementById('editPublicationForm').reset();
+                document.getElementById('editPublicationFormss').reset();
                 document.getElementById('editPublicationForm').style.display = 'none';
             })
             .catch(error => console.error('Error editing publication:', error));
@@ -400,7 +393,7 @@
     </div>
     <div id="editPublicationForm" style="display: none; margin-top: 20px;">
         <h2>Modificar Publicación</h2>
-        <form onsubmit="editPublicacion(event)">
+        <form onsubmit="editPublicacion(event)" id="editPublicationFormss">
             <input type="hidden" name="publicacionId">
             <label for="title">Título:</label>
             <input type="text" id="editTitle" name="title" required>
@@ -412,6 +405,7 @@
             <input type="text" id="editUrlMedia" name="urlMedia">
             <br>
             <button type="submit" class="edit-button">Guardar cambios</button>
+            <button type="button" class="delete-button" onclick="document.getElementById('editPublicationForm').style.display='none';">Cancelar</button>
         </form>
     </div>
     <h2 id="publicacionesTitle">Publicaciones</h2>
