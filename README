@@ -55,7 +55,7 @@ La API proporciona los siguientes endpoints:
     ejemplo: '"title": "nueva publiacion",
     "description": "descrip de la nueva publicacion",
     "urlMedia": "https://images-na.ssl-images-amazon.com/images/I/51y6qg0K2OL._SX331_BO1,204,203,200_.jpg",
-    "idUser":1"}' que al final se agrega por controllador el nuevo id que tendrá
+    "idUser":"671c1ca60c52024715133ad2"}'
     - `PUT /:id`: Actualiza una publicacion. (`router.put('/:id', Controller.updatePublicacion)`)
     - `DELETE /:id`: Elimina una publiacion. (`router.delete('/:id', Controller.deletePubli)`)
     - `GET /:id`: Obtiene una específico. (`router.get('/:id', Controller.getPublicacion)`)
@@ -76,6 +76,21 @@ La API proporciona los siguientes endpoints:
         "user": "671c1ca60c52024715133ad2"
     }
 
+    Solicitud de amistad:
+    POST
+    http://localhost:3000/api/amistad/
+    {
+        "userSend": "671c699303b768b4779672fe",
+        "userReq": "671c1ca60c52024715133ad2"
+    }
+
+    Aceptar Solucitud de amistad:
+    PUT
+    http://localhost:3000/api/amistad/671c1eb30bed28304bb0a34d
+    debe enviar el id de la solicitud por el path y en el body el estado:
+    {
+        "estado": "aceptado"
+    }
 
     ## Propósito Educativo
 
